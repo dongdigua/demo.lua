@@ -69,7 +69,7 @@ local demos = {}
 demos["hello"] = "print[[hello shenjack]]"
 
 local query=os.getenv("QUERY_STRING")
-if #query > 0 then
+if query ~= "" then
 	T=demos[query] or ""
 end
 
@@ -85,8 +85,25 @@ write[[</TEXTAREA>
 ]]
 io.flush()
 
-
+-- the serious thing begins
 if os.getenv("REQUEST_METHOD") == "POST" then
+
+-- limit resource
+local steplimit = 100
+local memlimit  = 100
+
+local count = 0
+local function step ()
+	count = count + 1
+	if collectgarbage("count") > memlimit then
+		error("DDoSer uses too much memory")
+	end
+	if count > steplimit then
+		error("DDoSer uses too much CPU")
+	end
+end
+
+debug.sethook(step, "", 100)
 
 -- delete unsafe functions
 arg=nil
@@ -123,6 +140,9 @@ else
 	end
 	collectgarbage()
 end
+
+write("\n-- steps/100:\t", count, "\n")
+write("-- memory:\t", string.format("%.2f",collectgarbage("count")), "\n")
 
 -- continue HTML
 write('</TEXTAREA><P><IMG SRC="https://lua.org/images/',I,'.png" ALIGN="absbottom">\n')
