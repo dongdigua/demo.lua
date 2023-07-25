@@ -29,10 +29,15 @@ input {
 Demo
 </H1>
 
+<P>
+Try Lua before
+<A HREF="https://lua.org/download.html">downloading</A> it.
+Enter your Lua program
+or
+choose one of the demo programs below.
 
 <DIV CLASS="menubar">
 <A HREF="/demo.lua?hello">hello</A>
-&middot;
 </DIV>
 
 <FORM ACTION="/demo.lua" METHOD="POST">
@@ -65,7 +70,7 @@ demos["hello"] = "print[[hello shenjack]]"
 
 local query=os.getenv("QUERY_STRING")
 if #query > 0 then
-	T=demos[query]
+	T=demos[query] or ""
 end
 
 -- continue HTML began in shell script
@@ -77,10 +82,11 @@ write[[</TEXTAREA>
 <INPUT TYPE="reset" VALUE="restore">
 <INPUT TYPE="button" VALUE="restart" onclick="window.location.href='/demo.lua'">
 </FORM>
-
-<H2>Output</H2>
-<TEXTAREA ROWS="8" COLS="72">]]
+]]
 io.flush()
+
+
+if os.getenv("REQUEST_METHOD") == "POST" then
 
 -- delete unsafe functions
 arg=nil
@@ -101,6 +107,9 @@ package=nil
 require=nil
 
 -- run program in global environment
+write[[<H2>Output</H2>
+<TEXTAREA ROWS="8" COLS="72">]]
+
 T,E=load(T,"=input","t")
 if not T then
 	print(E)	E="failed to compile"	I="alert"
@@ -119,3 +128,4 @@ end
 write('</TEXTAREA><P><IMG SRC="https://lua.org/images/',I,'.png" ALIGN="absbottom">\n')
 write('Your program ',E,'.\n')
 
+end
