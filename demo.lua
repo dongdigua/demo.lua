@@ -1,5 +1,7 @@
 #! /usr/local/bin/lua54
 
+-- vi: set noexpandtab :vi
+
 print("Content-Type: text/html\r\n\r\n")
 
 print[[
@@ -27,6 +29,12 @@ input {
 Demo
 </H1>
 
+
+<DIV CLASS="menubar">
+<A HREF="/demo.lua?hello">hello</A>
+&middot;
+</DIV>
+
 <FORM ACTION="/demo.lua" METHOD="POST">
 <TEXTAREA ROWS="16" COLS="72" NAME="input" maxlength="2000">]]
 
@@ -50,6 +58,15 @@ local print=print
 local tostring=tostring
 local unpack=table.unpack
 local write=io.write
+
+-- snippets
+local demos = {}
+demos["hello"] = "print[[hello shenjack]]"
+
+local query=os.getenv("QUERY_STRING")
+if #query > 0 then
+	T=demos[query]
+end
 
 -- continue HTML began in shell script
 write(T)
