@@ -37,10 +37,10 @@ or
 choose one of the demo programs below.
 
 <DIV CLASS="menubar">
-<A HREF="/demo.lua?hello">hello</A>
+<A HREF="./demo.lua?hello">hello</A>
 </DIV>
 
-<FORM ACTION="/demo.lua" METHOD="POST">
+<FORM ACTION="./demo.lua" METHOD="POST">
 <TEXTAREA ROWS="16" COLS="72" NAME="input" maxlength="2000">]]
 
 -- demo.lua
@@ -48,20 +48,6 @@ choose one of the demo programs below.
 
 local T=""
 local E,I
-
--- convert input  to plain text
-if os.getenv("REQUEST_METHOD") == "POST" then
-T=io.read"*a"
-T=string.match(T,"=(.-)$") or ""
-T=string.gsub(T,"+"," ")
-T=string.gsub(T,"%%(%x%x)",function (x) return string.char(tonumber(x,16)) end)
-T=string.gsub(T,"^%s*=%s*","return ")
-if T ~= "" then
-log=io.open("/logs/lua.log", "a")
-log:write("-- ", os.date(), "\n", T, "\n\n")
-log:close()
-end
-end
 
 -- save functions needed at the end
 local _G=_G
@@ -81,6 +67,20 @@ if query ~= "" then
 	T=demos[query] or ""
 end
 
+-- convert input  to plain text
+if os.getenv("REQUEST_METHOD") == "POST" then
+T=io.read"*a"
+T=string.match(T,"=(.-)$") or ""
+T=string.gsub(T,"+"," ")
+T=string.gsub(T,"%%(%x%x)",function (x) return string.char(tonumber(x,16)) end)
+T=string.gsub(T,"^%s*=%s*","return ")
+if T ~= "" then
+	log=io.open("/logs/lua.log", "a")
+	log:write("-- ", os.date(), "\n", T, "\n\n")
+	log:close()
+end
+end
+
 -- continue HTML began in shell script
 write(T)
 write[[</TEXTAREA>
@@ -88,7 +88,7 @@ write[[</TEXTAREA>
 <INPUT TYPE="submit" VALUE="run">
 <INPUT TYPE="button" VALUE="clear" onclick="this.form.elements['input'].value=''">
 <INPUT TYPE="reset" VALUE="restore">
-<INPUT TYPE="button" VALUE="restart" onclick="window.location.href='/demo.lua'">
+<INPUT TYPE="button" VALUE="restart" onclick="window.location.href='./demo.lua'">
 </FORM>
 ]]
 io.flush()
