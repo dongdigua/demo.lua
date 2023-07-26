@@ -1,4 +1,4 @@
-#! /usr/local/bin/lua54
+#! /lua/lua
 
 -- vi: set noexpandtab :vi
 
@@ -17,7 +17,7 @@ textarea {
 }
 
 input {
-	margin-right: 1em ;	
+	margin-right: 1em ;
 }
 </STYLE>
 </HEAD>
@@ -46,14 +46,22 @@ choose one of the demo programs below.
 -- demo.lua
 -- run user programs in constrained environment
 
-local T,E,I
+local T=""
+local E,I
 
 -- convert input  to plain text
+if os.getenv("REQUEST_METHOD") == "POST" then
 T=io.read"*a"
 T=string.match(T,"=(.-)$") or ""
 T=string.gsub(T,"+"," ")
 T=string.gsub(T,"%%(%x%x)",function (x) return string.char(tonumber(x,16)) end)
 T=string.gsub(T,"^%s*=%s*","return ")
+if T ~= "" then
+log=io.open("/logs/lua.log", "a")
+log:write("-- ", os.date(), "\n", T, "\n\n")
+log:close()
+end
+end
 
 -- save functions needed at the end
 local _G=_G
@@ -66,7 +74,7 @@ local write=io.write
 
 -- snippets
 local demos = {}
-demos["hello"] = "print[[hello shenjack]]"
+demos["hello"] = "setmetatable({}, {__gc = function() print[[hello shenjack]] end})"
 
 local query=os.getenv("QUERY_STRING")
 if query ~= "" then
@@ -96,10 +104,10 @@ local count = 0
 local function step ()
 	count = count + 1
 	if collectgarbage("count") > memlimit then
-		error("DDoSer uses too much memory")
+		error("DoSer uses too much memory")
 	end
 	if count > steplimit then
-		error("DDoSer uses too much CPU")
+		error("DoSer uses too much CPU")
 	end
 end
 
