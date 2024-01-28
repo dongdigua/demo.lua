@@ -1,0 +1,23 @@
+This is the source code for the Lua live demo that is available at
+	http://www.lua.org/cgi-bin/demo
+
+It has three parts:
+	demo		the CGI script
+	demo.html	the HTML page
+	demo.lua	the Lua program that runs user programs
+
+The CGI script is a sh script that handles both GET and POST requests.
+Empty GET requests return demo.html, which is what you see when you
+visit the URL above. Nonempty GET requests fill the text box with one of
+the demo programs listed in demo.html. Lua programs in the text box are
+run in reply to POST requests via a stock Lua interpreter.
+
+An important concern of the CGI script is security. Pains are taken to avoid
+executing scripts outside the cgi-bin directory and to avoid consuming too
+much time or memory when runnning user programs.
+
+The Lua program reads and parses the POST input and runs user programs in
+a constrained environment, again for security.
+
+This code is hereby placed in the public domain.
+Please send comments, suggestions, and bug reports to lhf@tecgraf.puc-rio.br .

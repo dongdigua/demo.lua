@@ -1,0 +1,46 @@
+#!/bin/sh
+
+LUA=/home/lhf/websites/lua.org/www/bin/lua
+LOG=log
+ECHO="/bin/echo -E"
+
+cat <<EOF
+Content-type: text/html
+
+EOF
+
+date "+%n@ %c $REMOTE_HOST $REQUEST_METHOD $HTTP_REFERER" >> $LOG
+if [ "$REQUEST_METHOD" = "GET" ]
+then
+	if [ "$QUERY_STRING" = "" ]
+	then
+		exec cat demo.html
+	else
+		$ECHO "$QUERY_STRING" >> $LOG
+		F=`basename -- "$QUERY_STRING"`.lua
+		sed '/TEXTAREA/q' demo.html
+		$ECHO "-- $F"
+		(cat -- "$F" 2>&1)
+		sed '1,/TEXTAREA/d' demo.html
+	fi
+else
+	sed '/TEXTAREA/q' demo.html
+	tee -a $LOG | (ulimit -t 1 ; $LUA demo.lua 2>&1 | head -c 8k)
+	cat <<EOF
+
+</TEXTAREA><P><IMG SRC="images/alert.png" ALIGN="absbottom">
+Your program was aborted.<!-- -->
+<P>
+
+<HR>
+<SMALL>
+EOF
+	$LUA -v 2>&1
+	cat <<EOF
+</SMALL>
+
+</BODY>
+</HTML>
+EOF
+	echo '' >> $LOG
+fi
